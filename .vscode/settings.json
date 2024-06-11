@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "stm32f1xx_hal_usart.h": "c",
+        "compare": "c",
+        "tim.h": "c",
+        "stm32f1xx_hal.h": "c",
+        "stm32f1xx_hal_conf.h": "c",
+        "stm32f1xx_hal_spi.h": "c",
+        "oled.h": "c",
+        "spi.h": "c",
+        "main.h": "c",
+        "gpio.h": "c",
+        "cstdint": "c",
+        "codetab.h": "c",
+        "usart.h": "c",
+        "i2c.h": "c"
+    }
+}
