@@ -26,7 +26,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "oled.h"
-#include "codetab.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,9 +48,12 @@
 
 /* USER CODE BEGIN PV */
 uint16_t delay_count=0;
-extern const unsigned char F14x16[];
-extern const unsigned char LIBLOGO60x58[480];
+unsigned char oled_page = 0;
 extern unsigned char BMP1[];
+extern unsigned char Mario_60[];
+extern unsigned char Mario_120[];
+extern unsigned char F8X16[][16];
+extern unsigned char F6x8[][6];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -71,14 +74,37 @@ void Delay_tick(uint32_t ms)
       
     }
 }
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  int mode;
+  oled_page++;
+  mode = oled_page % 3;
+  if(mode == 1)
+  {
+    OLED_Fill(0x00);
+     Draw_BMP(60,0,60,80,(unsigned char *)Mario_60);
+     OLED_Showchar(0,0,'K',Size_F8x16);
+  }
+  else if(mode ==2)
+  {
+    OLED_Fill(0x00);
+    Draw_BMP(0,0,120,80,(unsigned char *)Mario_120);
+  }
+  else
+  {
+    OLED_Fill(0x00);
+    OLED_Showchar(0,0,'L',Size_F8x16);
+  }
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-  void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-  {
-      HAL_GPIO_TogglePin(GPIOB, GPIO_Pin);
-  }
+//  void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+//  {
+//      HAL_GPIO_TogglePin(GPIOB, GPIO_Pin);
+//  }
 /* USER CODE END 0 */
 
 /**
@@ -116,8 +142,9 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   OLED_Init();
-  OLED_Fill(0xFF);
-  Draw_BMP(0,0,128,8,(unsigned char *)BMP1);
+  OLED_Fill(0x00);
+  //Draw_BMP(40,0,60,60,(unsigned char *)MArio);
+  //Draw_BMP(0,0,60,60,(unsigned char *)Mario2);
   
 
   /* USER CODE END 2 */

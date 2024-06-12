@@ -59,6 +59,7 @@ void Delay_tick(uint32_t ms);
 /* Private defines -----------------------------------------------------------*/
 #define KEY1_Pin GPIO_PIN_0
 #define KEY1_GPIO_Port GPIOA
+#define KEY1_EXTI_IRQn EXTI0_IRQn
 #define CS_Pin GPIO_PIN_3
 #define CS_GPIO_Port GPIOA
 #define DC_Pin GPIO_PIN_4

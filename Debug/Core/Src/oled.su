@@ -1,6 +1,10 @@
-../Core/Src/oled.c:9:16:OLED_WR_CMD	32	static
-../Core/Src/oled.c:24:16:OLED_WR_DATA	32	static
-../Core/Src/oled.c:39:6:OLED_Init	8	static
-../Core/Src/oled.c:73:6:OLED_Fill	24	static
-../Core/Src/oled.c:87:6:Draw_BMP	32	static
-../Core/Src/oled.c:104:6:OLED_Set_Pos	16	static
+../Core/Src/oled.c:14:16:OLED_WR_CMD	32	static
+../Core/Src/oled.c:29:16:OLED_WR_DATA	32	static
+../Core/Src/oled.c:50:6:OLED_Init	8	static
+../Core/Src/oled.c:90:6:OLED_Fill	24	static
+../Core/Src/oled.c:105:6:Draw_BMP	32	static
+../Core/Src/oled.c:124:6:OLED_Set_Pos	16	static
+../Core/Src/oled.c:133:6:OLED_CLS	8	static
+../Core/Src/oled.c:140:6:OLED_ON	8	static
+../Core/Src/oled.c:149:6:OLED_OFF	8	static
+../Core/Src/oled.c:219:6:OLED_Showchar	32	static
