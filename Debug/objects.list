@@ -1,3 +1,6 @@
+"./Core/Src/bsp_ov7725.o"
+"./Core/Src/bsp_sccb.o"
+"./Core/Src/dma.o"
 "./Core/Src/gpio.o"
 "./Core/Src/i2c.o"
 "./Core/Src/main.o"

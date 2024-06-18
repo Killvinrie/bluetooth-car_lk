@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dma.h"
 #include "i2c.h"
 #include "spi.h"
 #include "usart.h"
@@ -25,7 +26,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "stdio.h"
 #include "oled.h"
+#include "bsp_ov7725.h"
 
 /* USER CODE END Includes */
 
@@ -47,8 +50,12 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+uint8_t Ov7725_vsync = OV7725_RC_idle;
+volatile uint8_t frame_count = 0;
 uint16_t delay_count=0;
 unsigned char oled_page = 0;
+uint8_t oled_mode;
+char buffer[50];
 extern unsigned char BMP1[];
 extern unsigned char Mario_60[];
 extern unsigned char Mario_120[];
@@ -59,44 +66,7 @@ extern unsigned char F6x8[][6];
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-void Delay(uint32_t count)
-{
-	for(int i = 0;i < count; i++);
-}
-void Delay_tick(uint32_t ms)
-{
-    uint32_t start;
 
-    start = uwTick; //log the start value of systick
-
-    while(uwTick - start <ms) //wait until  x ms
-    {
-      
-    }
-}
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-  int mode;
-  oled_page++;
-  mode = oled_page % 3;
-  if(mode == 1)
-  {
-    OLED_Fill(0x00);
-     Draw_BMP(60,0,60,80,(unsigned char *)Mario_60);
-     OLED_Showchar(0,0,'K',Size_F8x16);
-  }
-  else if(mode ==2)
-  {
-    OLED_Fill(0x00);
-    Draw_BMP(0,0,120,80,(unsigned char *)Mario_120);
-  }
-  else
-  {
-    OLED_Fill(0x00);
-    OLED_Showchar(0,0,'L',Size_F8x16);
-  }
-}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -115,6 +85,8 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+
+	uint8_t retry = 0;
 
   /* USER CODE END 1 */
 
@@ -136,35 +108,57 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_SPI1_Init();
   MX_I2C1_Init();
-  MX_USART2_UART_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
+  FIFO_OE_L(); 
+  FIFO_WE_H(); 
+
   OLED_Init();
+  send_debug_info("oled_init done!");
   OLED_Fill(0x00);
-  //Draw_BMP(40,0,60,60,(unsigned char *)MArio);
-  //Draw_BMP(0,0,60,60,(unsigned char *)Mario2);
-  
+
+  while(OV7725_Init() != SUCCESS)
+	{
+		retry++;
+		if(retry>5)
+		{
+			send_debug_info("ov7725 init failed");
+			while(1);
+		}
+	}
+  send_debug_info("ov init success");
+
+  OV7725_Window_Set(ov7725.X_Start,ov7725.Y_Start,ov7725.Width,ov7725.Height,ov7725.VGA_QVGA);
+  Ov7725_vsync = 0;
+
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-	  // Delay(0xFFFFF);
-	  // Delay(0xFFFFF);
-    HAL_GPIO_WritePin(LED_G_GPIO_Port,LED_G_Pin,GPIO_PIN_RESET);
-    Delay_tick(500);
-    //OLED_Fill(0x00);
-    HAL_GPIO_WritePin(LED_G_GPIO_Port,LED_G_Pin,GPIO_PIN_SET);
-    Delay_tick(500);
-  
+   while (1)
+   {
+
+			if( Ov7725_vsync == OV7725_RC_done )
+			{   
+
+				frame_count++;
+				FIFO_PREPARE;
+				Img_Read(Img);
+				Img_Process(Img, Img1);
+				OLED_Print_pixel_Image(Img1,64,128);
+
+				Ov7725_vsync = OV7725_RC_idle;
+			}
+   }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+  // }
   /* USER CODE END 3 */
 }
 
@@ -208,6 +202,68 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void Delay(uint32_t count)
+{
+	for(int i = 0;i < count; i++);
+}
+
+void Delay_tick(uint32_t ms)
+{
+    uint32_t start;
+
+    start = uwTick; //log the start value of systick
+
+    while(uwTick - start <ms) //wait until  x ms
+    {
+      
+    }
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if(GPIO_Pin ==KEY1_Pin)
+  {
+    oled_page++;
+    oled_mode = oled_page % 3;
+    if (oled_mode == 1)
+    {
+      OLED_Fill(0x00);
+      Draw_BMP(60, 0, 60, 80, (unsigned char *)Mario_60);
+      OLED_Showchar(0, 0, 'K', Size_F8x16);
+    }
+    else if (oled_mode == 2)
+    {
+      OLED_Fill(0x00);
+      Draw_BMP(0, 0, 120, 80, (unsigned char *)Mario_120);
+    }
+    else
+    {
+      OLED_Fill(0x00);
+      OLED_Showchar(0, 0, 'L', Size_F8x16);
+    }
+  }
+  else if(GPIO_Pin ==VSYNC_Pin)
+  {
+
+    if (Ov7725_vsync == OV7725_RC_idle)
+    {
+      FIFO_WRST_L(); //reset the fifo write pointer
+      FIFO_WE_H();   //enable ov7725  transfer img to fifo
+
+      Ov7725_vsync = OV7725_RC_busy;
+      FIFO_WRST_H(); //avoid the write pointer keepping reset
+    }
+    else if (Ov7725_vsync == OV7725_RC_busy) // a  full frame is cached in FIFO
+    {
+      FIFO_WE_L(); // disable the ov7725 transfer
+      Ov7725_vsync = OV7725_RC_done;  
+    }
+  }
+  else
+  {
+      //unused
+  }
+}
 
 /* USER CODE END 4 */
 

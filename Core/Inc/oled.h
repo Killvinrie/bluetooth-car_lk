@@ -8,6 +8,7 @@
 #ifndef SRC_OLED_H_
 #define SRC_OLED_H_
 
+#include "stm32f1xx_hal.h"
 #include"main.h"
 #include"gpio.h"
 #include"spi.h"
@@ -25,6 +26,12 @@ typedef enum
 	Oled_Erro_edge
 }oled_erro;
 
+typedef enum
+{
+	oled_str,
+	oled_pic,
+	oled_camera
+}oled_status;
 
 __UINT8_TYPE__ OLED_WR_CMD(__UINT8_TYPE__ CMD);
 __UINT8_TYPE__ OLED_WR_DATA(__UINT8_TYPE__ DATA);
@@ -39,6 +46,7 @@ void OLED_OFF(void);
 void OLED_ShowStr(unsigned char x, unsigned char y, unsigned char ch[], unsigned char TextSize);
 void OLED_ShowCN(unsigned char x, unsigned char y, unsigned char N);
 void OLED_Showchar(unsigned char x, unsigned char y,unsigned char ch , unsigned char frontsize);
+void OLED_Print_pixel_Image(uint8_t *pucTable, uint16_t usRowNum, uint16_t usColumnNum);
 
 
 

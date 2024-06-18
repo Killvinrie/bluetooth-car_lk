@@ -13,6 +13,18 @@
         "cstdint": "c",
         "codetab.h": "c",
         "usart.h": "c",
-        "i2c.h": "c"
-    }
+        "i2c.h": "c",
+        "bsp_sccb.h": "c",
+        "dma.h": "c",
+        "stm32f1xx_hal_def.h": "c",
+        "stm32f1xx_hal_gpio.h": "c",
+        "stm32f1xx_it.h": "c",
+        "bsp_ov7725.h": "c",
+        "stm32f1xx_hal_exti.h": "c",
+        "stm32f1xx_hal_rcc.h": "c",
+        "stm32f1xx.h": "c",
+        "stddef.h": "c",
+        "stm32_hal_legacy.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }

@@ -6,7 +6,7 @@
  */
 #include "oled.h"
 #include "codetab.h"
-
+#include "usart.h"
 
 unsigned char oled_erro_code = Oled_Erro_None;
 
@@ -59,7 +59,7 @@ void OLED_Init(void)
 	OLED_WR_CMD(0x10); //---set high column address
 	OLED_WR_CMD(0x40); //--set start line address
 	OLED_WR_CMD(0x81); //--set contrast control register
-	OLED_WR_CMD(0xff); //�?????度调�????? 0x00~0xff
+	OLED_WR_CMD(0xff); //�??????度调�?????? 0x00~0xff
 	OLED_WR_CMD(0xa1); //--set segment re-map 0 to 127
 	OLED_WR_CMD(0xa6); //--set normal display
 	OLED_WR_CMD(0xa8); //--set multiplex ratio(1 to 64)
@@ -82,11 +82,7 @@ void OLED_Init(void)
 } 
 
 
- /**
-  * @brief  OLED_Fill，填充整�?????屏幕
-  * @param  fill_Data:要填充的数据
-	* @retval �?????
-  */
+
 void OLED_Fill(unsigned char bmp_data)
 {
 	unsigned char y,x;
@@ -245,5 +241,53 @@ void OLED_Showchar(unsigned char x, unsigned char y,unsigned char ch , unsigned 
 	}
 }
 
+void OLED_Print_pixel_Image(uint8_t *pucTable, uint16_t usRowNum, uint16_t usColumnNum)
+{
+    uint8_t ucData;
+    uint16_t i,j,k,m,n;
+    uint16_t usRowTmp;
 
+    m = usRowNum >> 3;   
+    n = usRowNum % 8;    
+    
+    for(i = 0; i < m; i++) 
+    {
+        OLED_Set_Pos(0,(uint8_t)i);
+        usRowTmp = i << 3;                     
+        for(j = 0; j < usColumnNum; j++)       
+        {
+            ucData = 0;
+            for(k = 0; k < 8; k++) 
+            {
+                ucData = ucData >> 1;
+                if((pucTable + (usRowTmp + k) * usColumnNum)[j] == 0)
+                {
+                    ucData = ucData | 0x80;
+                }
+            }
+            OLED_WR_DATA(ucData);
+//			send_debug_info("sent");
+        }
+    }
+    
+    OLED_Set_Pos(0,(uint8_t)i); 
+    usRowTmp = i << 3;                      
+    for(j = 0; j < usColumnNum; j++)        
+    {
+        ucData = 0;
+        for(k = 0; k < n; k++) 
+        {
+            ucData = ucData >> 1;
+            if((pucTable + (usRowTmp + k) * usColumnNum)[j] == 1)
+            {
+                ucData = ucData | 0x80;
+            }
+            
+        }
+        ucData = ucData >> (8 - n);
+        OLED_WR_DATA(ucData);
+    }
+
+    return;
+}
 
