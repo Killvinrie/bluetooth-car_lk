@@ -1,0 +1,12 @@
+../Core/Src/bsp_ov7725.c:322:13:OV7725_Init	6
+../Core/Src/bsp_ov7725.c:375:6:OV7725_Light_Mode	7
+../Core/Src/bsp_ov7725.c:437:6:OV7725_Color_Saturation	3
+../Core/Src/bsp_ov7725.c:458:6:OV7725_Brightness	10
+../Core/Src/bsp_ov7725.c:523:6:OV7725_Contrast	3
+../Core/Src/bsp_ov7725.c:548:6:OV7725_Special_Effect	8
+../Core/Src/bsp_ov7725.c:616:6:OV7725_Window_Set	2
+../Core/Src/bsp_ov7725.c:690:6:OV7725_Window_VGA_Set	1
+../Core/Src/bsp_ov7725.c:745:5:Otsu	8
+../Core/Src/bsp_ov7725.c:793:6:READ_FIFO_PIXEL	1
+../Core/Src/bsp_ov7725.c:803:6:Img_Read	3
+../Core/Src/bsp_ov7725.c:823:6:Img_Process	4
